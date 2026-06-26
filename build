@@ -1,0 +1,16 @@
+#!/bin/bash
+# Configure + build the pl library (Debug). The build tree lives in bin/debug.
+#
+# Pass extra CMake args through, e.g. to build a shared library:
+#   ./build -DBUILD_SHARED_LIBS=ON
+set -e
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+BUILD_DIR="$ROOT/bin/debug"
+
+cmake -S "$ROOT" -B "$BUILD_DIR" \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  "$@"
+
+cmake --build "$BUILD_DIR"

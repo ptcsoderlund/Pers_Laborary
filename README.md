@@ -1,4 +1,4 @@
-# Pers_Laborary — a productivity framework for C
+# Pers_Laborary - a productivity framework for C
 
 This is my laboratory for experimenting and learning C.
 PL is a productivity library. Like a standard library.
