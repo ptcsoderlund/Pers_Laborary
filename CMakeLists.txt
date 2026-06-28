@@ -15,6 +15,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(pl)
 
+if(PROJECT_IS_TOP_LEVEL)
+  add_executable(sandbox pl/src/sandbox/main.c)
+  target_link_libraries(sandbox PRIVATE pl::pl)
+  target_compile_features(sandbox PRIVATE c_std_23)
+  set_target_properties(sandbox PROPERTIES
+    C_STANDARD 23
+    C_STANDARD_REQUIRED ON
+    C_EXTENSIONS OFF)
+endif()
+
 # Convenience for clangd: mirror the generated compile_commands.json next to the
 # sources so the language server finds it by walking up from any file in pl/.
 # Only the build-tree copy is authoritative; this one is gitignored.

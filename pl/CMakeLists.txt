@@ -3,6 +3,7 @@
 # Sources and public headers are globbed (CONFIGURE_DEPENDS makes CMake re-glob
 # on build, so newly added files are picked up without a manual re-configure).
 file(GLOB_RECURSE PL_SOURCES CONFIGURE_DEPENDS src/*.c)
+list(FILTER PL_SOURCES EXCLUDE REGEX ".*/sandbox/.*")
 file(GLOB_RECURSE PL_HEADERS CONFIGURE_DEPENDS include/*.h)
 
 # No STATIC/SHARED keyword: the type follows BUILD_SHARED_LIBS, so the consumer
