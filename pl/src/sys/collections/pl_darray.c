@@ -82,7 +82,7 @@ pl_error pl_darray_add(pl_darray **arr, const void *item) {
   return pl_error_none();
 }
 
-pl_error pl_darray_get_item_at(pl_darray *arr, usize index, void **result) {
+pl_error pl_darray_get_item_val_at(pl_darray *arr, usize index, void *result) {
   assert(arr != nullptr);
   assert(result != nullptr);
   pl_error param_checks[] = {
@@ -102,32 +102,55 @@ pl_error pl_darray_get_item_at(pl_darray *arr, usize index, void **result) {
     return error_check;
   u8 *payload_start = (u8 *)arr + header_size();
   u8 *item_start = payload_start + index * header->bytes_per_item;
-  *result = (void *)item_start;
+  memcpy(result,item_start,header->bytes_per_item);
+  return pl_error_none();
+}
+pl_error pl_darray_set_item_val_at(pl_darray* arr,usize index,const void* value){
+  assert(arr != nullptr);
+  assert(value != nullptr);
+  pl_error param_checks[] = {
+      pl_error_if(arr == nullptr, PL_ERROR_NULL_PARAM, "arr is null"),
+      pl_error_if(value == nullptr, PL_ERROR_NULL_PARAM,
+                     "value is null"),
+  };
+  pl_error param_checks_result = pl_error_first_or_none_x(param_checks);
+  if (!pl_error_is_none(param_checks_result))
+    return param_checks_result;
+  pl_darray_header *header = (pl_darray_header *)arr;
+  assert(index < header->item_count);
+  pl_error error_check =
+      pl_error_if(header->item_count <= index, PL_ERROR_OUT_OF_BOUNDS,
+                     "index out of range");
+  if (!pl_error_is_none(error_check))
+    return error_check;
+  u8 *payload_start = (u8 *)arr + header_size();
+  u8 *item_start = payload_start + index * header->bytes_per_item;
+  memcpy(item_start,value,header->bytes_per_item);
   return pl_error_none();
 }
 
-bool pl_darray_foreach(pl_darray* arr, void** current_item){
+bool pl_darray_foreach(pl_darray* arr, void** item_iter){
   assert(arr != nullptr);
-  assert(current_item != nullptr);
+  assert(item_iter != nullptr);
   pl_darray_header* header = (pl_darray_header*)arr;
   u8* payload_start = (u8*)arr+header_size();
-  u8* next_item = (*current_item) == nullptr ? payload_start : (u8*)(*current_item)+header->bytes_per_item;
+  u8* next_item = (*item_iter) == nullptr ? payload_start : (u8*)(*item_iter)+header->bytes_per_item;
   usize dist_next = next_item-payload_start;
   if(dist_next >= header->item_count*header->bytes_per_item){
-    *current_item = nullptr;
+    *item_iter = nullptr;
     return false;
   }
-  *current_item = next_item;
+  *item_iter = next_item;
   return true;
 }
 
-bool pl_darray_for_i(pl_darray *arr, void **current_item, usize *index_out) {
+bool pl_darray_for_i(pl_darray *arr, void **item_iter, usize *index_out) {
   assert(index_out != nullptr);
-  assert(current_item != nullptr);
-  if (*current_item == nullptr) {
+  assert(item_iter != nullptr);
+  if (*item_iter == nullptr) {
     *index_out = SIZE_MAX;//we increment into first element with overflow
   }
-  if (pl_darray_foreach(arr, current_item)) {
+  if (pl_darray_foreach(arr, item_iter)) {
     *index_out += 1;
     return true;
   }
