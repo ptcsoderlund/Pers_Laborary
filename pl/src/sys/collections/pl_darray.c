@@ -132,7 +132,12 @@ pl_error pl_darray_set_item_val_at(pl_darray* arr,usize index,const void* value)
 bool pl_darray_foreach(pl_darray* arr, void** item_iter){
   assert(arr != nullptr);
   assert(item_iter != nullptr);
+  
   pl_darray_header* header = (pl_darray_header*)arr;
+  if(header->item_count == 0){
+    *item_iter = nullptr;
+    return false;
+  }
   u8* payload_start = (u8*)arr+header_size();
   u8* next_item = (*item_iter) == nullptr ? payload_start : (u8*)(*item_iter)+header->bytes_per_item;
   usize dist_next = next_item-payload_start;

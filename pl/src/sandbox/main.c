@@ -40,18 +40,26 @@ void arena_test(){
   pl_arena_free(&arena);
 }
 void darray_test(){
+  pl_print_info_ln("------ darray_test ------");
   pl_darray* my_arr = nullptr;
   pl_darray_new(&my_arr,sizeof(i32));
   i32 add_me = 200;
+  pl_print_info_ln("Adding %i to darray",add_me);
   pl_darray_add(&my_arr,&add_me);
+  pl_print_info_ln("Adding %i to darray",400);
   pl_darray_add_val_x(&my_arr,400);
 
-  i32 item = 0;
+  i32* item = nullptr;
   usize index = 0;
+  pl_print_info_ln("Iterating over darray");
   while(pl_darray_for_i(my_arr,(void**)&item,&index)){
-    pl_print_info_ln("darray_for_i, index: %u,item: %i",index,item);
+    pl_print_info_ln("darray_for_i, index: %zu, item: %i", index, *item);
   }
-  pl_darray_free(&my_arr);
+  pl_print_info_ln("Iterating over darray with for_each");
+  item = nullptr;
+  while(pl_darray_foreach(my_arr,(void**)&item)){
+    pl_print_info_ln("darray_foreach, item: %i",*item);
+  }
 }
 
 int main(void) {
